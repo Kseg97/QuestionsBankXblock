@@ -1,0 +1,3 @@
+[xblock.v1]
+questions_bank = questions_bank:QuestionsBankXBlock
+

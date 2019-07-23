@@ -1,0 +1,37 @@
+<!-- STUDIO VIEW -->
+<!-- Based on index.html and sjfb-builder, see more at Javascript docum -->
+<div class="questions_bank_block">
+    <div id="sjfb-body">
+        <div id="sjfb-wrap">
+            <h1>Sistema para creación de preguntas (banco de preguntas)</h1>
+
+            <div class="alert hide">
+                <h2>Completado! El banco ha sido guardado.</h2>
+                <!-- TODO: remove when stable -->
+                <p>Aquí está el formato del banco guardado.</p>
+                <textarea></textarea>
+            </div>
+
+            <div class="add-wrap">
+                <h3>Agregar pregunta:</h3>
+                <ul id="add-field">
+                    <li><a id="add-radio" data-type="radio" href="#">Opción simple (radio buttons)</a></li>
+                    <li><a id="add-checkbox" data-type="checkbox" href="#">Opción múltiple (checkboxes)</a></li>
+                </ul>
+                <p>Marque la opción 'es requerido' si debe marcarse al menos una opción.
+                    Marque la opción 'es la respuesta' si corresponde a la respuesta.
+                    Puede tener mútiples respuestas SOLO para opción múltiple.</p>
+            </div>
+
+            <form id="sjfb" novalidate>
+                <div id="form-fields">
+                </div>
+                <br>
+                Ingrese el número de preguntas por estudiante:<br>
+                <input id="num_questions" type="number" name="num_questions" value="0" required>
+                <br>
+                <button type="submit" class="submit">Crear Banco</button>
+            </form>
+        </div>
+        </body>
+    </div>
