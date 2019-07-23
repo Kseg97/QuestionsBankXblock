@@ -39,6 +39,45 @@ function StudioQuestionsBankXBlock(runtime, element) {
     var handlerUrlCreateBank = runtime.handlerUrl(element, 'create_bank');
     var handlerUrlLoadBank = runtime.handlerUrl(element, 'load_bank');
 
+    function loadIntoFields(data) {
+        //go through each saved field object and render the builder
+        $.each(data, function (k, v) {
+            console.log(JSON.stringify(v))
+            //Add the field
+            //Add the field
+            $(addField(v['type'])).appendTo('#form-fields').hide().slideDown('fast');
+            var $currentField = $('#form-fields .field').last();
+
+            //Add the label
+            $currentField.find('.field-label').val(v['label']);
+
+            //Is it required?
+            if (v['req']) {
+                requiredField($currentField.find('.toggle-required'));
+            }
+
+            //Any choices?
+            if (v['choices']) {
+                $.each(v['choices'], function (k, v) {
+                    //add the choices
+                    $currentField.find('.choices ul').append(addChoice());
+
+                    //Add the label
+                    $currentField.find('.choice-label').last().val(v['label']);
+
+                    //Is it selected?
+                    if (v['sel']) {
+                        selectedChoice($currentField.find('.toggle-selected').last());
+                    }
+                });
+            }
+
+        });
+
+        $('#form-fields').sortable();
+        $('.choices ul').sortable();
+    }
+
     //TODO: change formID with bank ID and userID (teacher)
     //Loads a saved form from our global variable 'questions' into the builder
     function loadForm(formID) {
@@ -48,57 +87,33 @@ function StudioQuestionsBankXBlock(runtime, element) {
             data: formID,
             dataType: 'json',
             success: function (data) {
-                // TODO: Handle data={}, allow to import JSON and also load from DB if any.
-
-                //go through each saved field object and render the builder
-                $.each(data, function (k, v) {
-                    console.log(JSON.stringify(v))
-                    //Add the field
-                    //Add the field
-                    $(addField(v['type'])).appendTo('#form-fields').hide().slideDown('fast');
-                    var $currentField = $('#form-fields .field').last();
-
-                    //Add the label
-                    $currentField.find('.field-label').val(v['label']);
-
-                    //Is it required?
-                    if (v['req']) {
-                        requiredField($currentField.find('.toggle-required'));
-                    }
-
-                    //Any choices?
-                    if (v['choices']) {
-                        $.each(v['choices'], function (k, v) {
-                            //add the choices
-                            $currentField.find('.choices ul').append(addChoice());
-
-                            //Add the label
-                            $currentField.find('.choice-label').last().val(v['label']);
-
-                            //Is it selected?
-                            if (v['sel']) {
-                                selectedChoice($currentField.find('.toggle-selected').last());
-                            }
-                        });
-                    }
-
-                });
-
-                $('#form-fields').sortable();
-                $('.choices ul').sortable();
+                //TODO: data could also be provided by a DB
+                loadIntoFields(data);
             }
         });
     }
 
     //TODO: change formID with bank ID and userID (teacher)
     $(function ($) {
-        //If loading a saved form from your database, put the ID here. Example id is "1".
+        // If loading a saved form from your database, put the ID here. Example id is "1".
         var formID = '1';
-
-        //TODO: load saved form (bank)
         loadForm(formID);
 
-        //Saving form
+        // Load default JSON sample
+        $("#textarea-load").val('[{"type":"radio","label":"Pregunta 1","req":1,"choices":[{"label":"Opc 1","sel":0},{"label":"Opc 2","sel":1}]},{"type":"radio","label":"Pregunta 2","req":1,"choices":[{"label":"Opc 1","sel":1},{"label":"Opc 2","sel":0}]}]');
+
+        // Load custom JSON form (bank)
+        $("#sjfb-load").click(function (event) {
+            event.preventDefault();
+
+            //empty out the preview area
+            $("#form-fields").empty();
+
+            var data = JSON.parse($("#textarea-load").val());
+            loadIntoFields(data);
+        });
+
+        // Saving form
         $("#sjfb").submit(function (event) {
             event.preventDefault();
 
@@ -150,13 +165,14 @@ function StudioQuestionsBankXBlock(runtime, element) {
             });
 
             num_questions = $('#num_questions').val();
+            alert("has definido " + num_questions + " preguntas por estudiante");
 
             //SAVE FORM (TO DATABASE OR SCOPE)
             //TODO: change formID to BankID and UserID
             var data = JSON.stringify([
-                { "name": "formID", "value": formID }, 
+                { "name": "formID", "value": formID },
                 { "name": "formFields", "value": fields },
-                { "name": "num_questions", "value": num_questions }, 
+                { "name": "num_questions", "value": num_questions },
             ]);
 
             //alert(data);

@@ -126,7 +126,7 @@ function StudentQuestionsBankXBlock(runtime, element) {
 
                     score = data;
 
-                    $('#sjfb-fields').append('<p>Tu evaluación es ' + score['score'] + '.</p>');
+                    $('#sjfb-fields').append('<p>Tu evaluación es ' + score['score'] + ' de 100.</p>');
                     $("#btnSubmit").attr("disabled", true);
                 }
             });

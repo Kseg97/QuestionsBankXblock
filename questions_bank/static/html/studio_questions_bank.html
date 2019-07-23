@@ -7,12 +7,19 @@
 
             <div class="alert hide">
                 <h2>Completado! El banco ha sido guardado.</h2>
-                <!-- TODO: remove when stable -->
-                <p>Aquí está el formato del banco guardado.</p>
+                <!-- TODO: remove when stable. Implement JSON file loader or DB -->
+                <p>Aquí está el formato del banco guardado. Copialo en un archivo
+                    de texto y guardalo en un lugar seguro</p>
                 <textarea></textarea>
             </div>
 
             <div class="add-wrap">
+                <h3>Cargar un banco</h3>
+                <p>El banco debe estar en formato JSON (copie y pegue el contenido,
+                    reemplazando el actual). Cree uno nuevo si no dispone de uno.</p>
+                <textarea id="textarea-load"></textarea><br>
+                <button id="sjfb-load">Cargar banco</button>
+
                 <h3>Agregar pregunta:</h3>
                 <ul id="add-field">
                     <li><a id="add-radio" data-type="radio" href="#">Opción simple (radio buttons)</a></li>
@@ -30,7 +37,7 @@
                 Ingrese el número de preguntas por estudiante:<br>
                 <input id="num_questions" type="number" name="num_questions" value="0" required>
                 <br>
-                <button type="submit" class="submit">Crear Banco</button>
+                <button type="submit" class="submit">Guardar Banco</button>
             </form>
         </div>
         </body>

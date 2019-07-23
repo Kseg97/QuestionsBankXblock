@@ -32,6 +32,7 @@ from xblock.fragment import Fragment
 
 import copy
 import random
+import json
 
 @XBlock.needs("user")
 class QuestionsBankXBlock(XBlock):
@@ -76,8 +77,6 @@ class QuestionsBankXBlock(XBlock):
         # TODO: Loads student_questions_bank HTML
         html = self.resource_string("static/html/student_questions_bank.html")
         frag = Fragment(html.format(self=self))
-
-        print(self.questions)
         
         frag.add_css(self.resource_string("static/css/questions_bank.css"))
         
@@ -116,9 +115,6 @@ class QuestionsBankXBlock(XBlock):
         # Saves to global user_state_summary
         self.questions = data
 
-        print(self.questions)
-        print("success")
-
         return { 'msg': "success" }
 
     @XBlock.json_handler
@@ -127,7 +123,6 @@ class QuestionsBankXBlock(XBlock):
         Handler to load an already created bank data. Returns global 'questions'.
         """
         form_id = data # TODO: not used yet, see JS
-        print(form_id)
 
         # Returns only questions (bank) content
         return self.questions[1]['value'] if self.questions else {} # Handle {} in JS
@@ -139,34 +134,35 @@ class QuestionsBankXBlock(XBlock):
         answers are saved to user_questions (user_state) but ONLY questions are sent
         to the Javascript file. If hasCompleted is true, a message is shown.
         """
+        formID = data 
+        
         # TODO: show a view with completed questions (requires use case where a long time 
         # or instructor approval is needed to release answers)
 
-        # TODO: Create hasCompleted
-
         # To return ONLY questions not sel (answer) attribute. And ONLY questions (bank) content
-        
         only_questions = {}
 
         if not self.studentHasCompleted:
-            num_questions = int(self.questions[2]['value'])  
-    
             if self.questions:
+                # Load the number of questions per student (see estructure at the begining of th script)            
+                num_questions = int(self.questions[2]['value']) 
                 if self.studentQuestionary:
-                    only_questions = self.studentQuestionary
+                    # If an already created questionary exists, use it
+                    only_questions = self.studentQuestionary 
 
                 else:
+                    # Obtain only a N sample from the questions content (value at [1])
                     only_questions = random.sample(copy.deepcopy(self.questions[1]['value']), num_questions)
+                    # Saves a questionary per student, to keep track of it
+                    self.studentQuestionary = copy.deepcopy(only_questions)
+                    
+                    # Now we delete the answers, to avoid (partially) a frontend hack
                     for question in only_questions:
                         # Obtain choices (questions also contain type, req and label)
                         for option in question['choices']:
                             # And then delete 'sel' attribute
-                            del option['sel']
-                    
-                    self.studentQuestionary = copy.deepcopy(only_questions)
-                                
-        print(only_questions)
-
+                            del option['sel']                  
+        
         return only_questions # Handle {} in JS
 
     @XBlock.json_handler
@@ -175,14 +171,56 @@ class QuestionsBankXBlock(XBlock):
         Handler to load an already created bank data. Returns global 'questions'.
         """
         
-        print(data)
-        # TODO: grading score and return
+        # print(data)
+        # print(self.studentQuestionary)
+        scores = []
+        
+        for idx_qst in range(len(self.studentQuestionary)):
+            question = self.studentQuestionary[idx_qst]['choices']
+            answer = data[idx_qst]['choices']
 
-        self.studentAnsweredQuestions = data #TODO: +qst+rans+u_name+uid+score
-        self.studentHasCompleted = True
+            total_valid = 0
+            user_right = 0
+            for idx_cho in range(len(question)):
+                qst_ans = question[idx_cho]['sel']
+                stu_ans = answer[idx_cho]['sel']
+                
+                if qst_ans == 1:
+                    
+                    total_valid += 1
+
+                    if stu_ans == qst_ans:
+                        user_right += 1
+
+            qst_score = float(user_right)/total_valid
+            scores.append(qst_score)
+
+        if len(scores) > 0:
+            score = (sum(scores)/len(scores))*100
+        else:
+            score = 0
+
+        # Notice data structure at the answered questionary
+        answeredQuestions = {}
+        answeredQuestions['user_id'] = self.scope_ids.user_id
+        
+        user_service = self.runtime.service(self, 'user')
+        xb_user = user_service.get_current_user()
+        answeredQuestions['user_full_name'] = xb_user.full_name
+        #answeredQuestions['user_email'] = xb_user.email #TODO: Implement in Studio, in workbench doesnt work
+        
+        answeredQuestions['student_answers'] = copy.deepcopy(data)
+        answeredQuestions['student_qustionary'] = copy.deepcopy(self.studentQuestionary)
+
+        # TODO: grade this value into platform
+        # Score value is based on 100
+        answeredQuestions['score'] = score
+
+        self.studentAnsweredQuestions = json.dumps(answeredQuestions)
+        #self.studentHasCompleted = True
 
         # Returns only questions (bank) content
-        return { 'score': "100" }
+        return { 'score': score }
 
     # Scenarios for the workbench. Ignore.
     @staticmethod
