@@ -14,18 +14,18 @@ function StudentQuestionsBankXBlock(runtime, element) {
     var handlerUrlCompleteQuestions = runtime.handlerUrl(element, 'complete_questions');
     var handlerUrlLoadQuestionary = runtime.handlerUrl(element, 'load_questionary');
 
-    // TODO: this case should be able to:
+    // This view should be able to:
     // *A. download an specific random generated questionary
-    //    apparently theres no need for ID, rather ONLY qst
-    //    save on user_state qst+ans but only send qst
+    //     - apparently theres no need for ID, rather ONLY qst
+    //     - save on user_state qst+ans but only send qst
     // *B. Display questions to student
     // *C. return answers to python
-    ///--in python
+    //--in python
     // *A. gather answers
     // *B. grade answers
     // *C. return grading as a result to JS petition (C)
     // *D. save qst+answers and score into user_state
-    //    TODO: put hasCompleted=True
+    //     - put hasCompleted=True
     // *E. save qst+answers, score and user_name into user_state_summ
 
     //generates the form HTML

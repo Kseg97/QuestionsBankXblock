@@ -59,7 +59,7 @@ class QuestionsBankXBlock(XBlock):
         help="Student questionary containing both questions and answers.",
     )
     studentAnsweredQuestions = JSONField(
-        default={}, scope=Scope.user_state_summary,
+        default=[], scope=Scope.user_state_summary,
         help="Solved questionary with details about the student.",
     )
 
@@ -74,7 +74,6 @@ class QuestionsBankXBlock(XBlock):
         The primary view of the QuestionsBankXBlock, shown to students
         when viewing courses.
         """          
-        # TODO: Loads student_questions_bank HTML
         html = self.resource_string("static/html/student_questions_bank.html")
         frag = Fragment(html.format(self=self))
         
@@ -94,16 +93,24 @@ class QuestionsBankXBlock(XBlock):
         when viewing courses.
         """
         # Notice the Studio prefix at HTML and JS file, also JS initializer
-        html = self.resource_string("static/html/studio_questions_bank.html")
-        frag = Fragment(html.format(self=self))
+        if(len(self.studentAnsweredQuestions)):
+            html = self.resource_string("static/html/studio_analytics.html")
+            frag = Fragment(html.format(self=self))
+            frag.initialize_js('StudioAnalytics')
+            frag.add_javascript(self.resource_string("static/js/src/studio_analytics.js"))
 
-        frag.add_css(self.resource_string("static/css/questions_bank.css"))
-        
-        frag.add_javascript(self.resource_string("static/js/src/jquery-2.1.4.min.js"))
-        frag.add_javascript(self.resource_string("static/js/src/jquery-ui.min.js"))
-        frag.add_javascript(self.resource_string("static/js/src/studio_questions_bank.js"))
-        
-        frag.initialize_js('StudioQuestionsBankXBlock')
+        else:
+            html = self.resource_string("static/html/studio_questions_bank.html")
+            frag = Fragment(html.format(self=self))
+
+            frag.add_css(self.resource_string("static/css/questions_bank.css"))
+            
+            frag.add_javascript(self.resource_string("static/js/src/jquery-2.1.4.min.js"))
+            frag.add_javascript(self.resource_string("static/js/src/jquery-ui.min.js"))
+            frag.add_javascript(self.resource_string("static/js/src/studio_questions_bank.js"))
+            
+            frag.initialize_js('StudioQuestionsBankXBlock')
+
         return frag
     
     @XBlock.json_handler
@@ -170,9 +177,6 @@ class QuestionsBankXBlock(XBlock):
         """
         Handler to load an already created bank data. Returns global 'questions'.
         """
-        
-        # print(data)
-        # print(self.studentQuestionary)
         scores = []
         
         for idx_qst in range(len(self.studentQuestionary)):
@@ -210,17 +214,25 @@ class QuestionsBankXBlock(XBlock):
         #answeredQuestions['user_email'] = xb_user.email #TODO: Implement in Studio, in workbench doesnt work
         
         answeredQuestions['student_answers'] = copy.deepcopy(data)
-        answeredQuestions['student_qustionary'] = copy.deepcopy(self.studentQuestionary)
+        answeredQuestions['student_questionary'] = copy.deepcopy(self.studentQuestionary)
 
         # TODO: grade this value into platform
         # Score value is based on 100
         answeredQuestions['score'] = score
 
-        self.studentAnsweredQuestions = json.dumps(answeredQuestions)
-        #self.studentHasCompleted = True
+        self.studentAnsweredQuestions.append(json.dumps(answeredQuestions))
+        self.studentHasCompleted = True # COMMENT for testing reasons related to grading
 
         # Returns only questions (bank) content
         return { 'score': score }
+
+    @XBlock.json_handler
+    def load_analytics(self, data, suffix=''):
+        """
+        Handler to load an already created bank data. Returns global 'questions'.
+        """
+        formID = data #TODO: not implemented yet
+        return self.studentAnsweredQuestions
 
     # Scenarios for the workbench. Ignore.
     @staticmethod
