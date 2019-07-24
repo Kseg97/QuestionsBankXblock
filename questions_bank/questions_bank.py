@@ -42,6 +42,7 @@ class QuestionsBankXBlock(XBlock):
     questions are randomized and disposed in number as desired by the instructor. XBlock 
     behaves a grading problem.
     """
+    hasScore = True
     # TODO: some of the functionalities above are not yet supported. Check through time
     # or contact camilosegura@unicauca.edu.co
 
@@ -216,9 +217,10 @@ class QuestionsBankXBlock(XBlock):
         answeredQuestions['student_answers'] = copy.deepcopy(data)
         answeredQuestions['student_questionary'] = copy.deepcopy(self.studentQuestionary)
 
-        # TODO: grade this value into platform
+        # TODO: TEST:grade this value into platform
         # Score value is based on 100
         answeredQuestions['score'] = score
+        self.runtime.publish(self, "grade", { value: score, max_value: 100.0 })
 
         self.studentAnsweredQuestions.append(json.dumps(answeredQuestions))
         self.studentHasCompleted = True # COMMENT for testing reasons related to grading
