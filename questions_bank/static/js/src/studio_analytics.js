@@ -24,7 +24,7 @@ function StudioAnalytics(runtime, element) {
 
                 //Add the label
                 $currentField.find('label').text(questionary[i].label);
-
+                
                 //Any choices?
                 if (questionary[i].choices) {
                     var uniqueID = Math.floor(Math.random() * 999999) + 1;
@@ -82,7 +82,7 @@ function StudioAnalytics(runtime, element) {
             var id = this.id.split('-')[1];
             var user_data = JSON.parse(data[id]);
             // alert(JSON.stringify(user_data))
-            generateUserAnalytic(user_data.student_qustionary, user_data.student_answers);
+            generateUserAnalytic(user_data.student_questionary, user_data.student_answers);
         })
     }
 
