@@ -87,6 +87,9 @@ class QuestionsBankXBlock(XBlock):
         frag.initialize_js('StudentQuestionsBankXBlock')
         return frag
     
+    # Important. Documentation isn't clear. Found at thumbs.py example. Problems use to declare problem_view in their source code.
+    problem_view = student_view
+
     #TODO: provide instructors information and bank keys(?)
     def studio_view(self, context=None):
         """
@@ -220,7 +223,8 @@ class QuestionsBankXBlock(XBlock):
         # TODO: TEST:grade this value into platform
         # Score value is based on 100
         answeredQuestions['score'] = score
-        self.runtime.publish(self, "grade", { value: score, max_value: 100.0 })
+        # On publish a JSON, mind using string-defined properties like 'value':, rather than just value:
+        self.runtime.publish(self, "grade", { 'value': score, 'max_value': 100.0 })
 
         self.studentAnsweredQuestions.append(json.dumps(answeredQuestions))
         self.studentHasCompleted = True # COMMENT for testing reasons related to grading
