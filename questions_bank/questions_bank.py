@@ -79,9 +79,9 @@ class QuestionsBankXBlock(XBlock):
         frag = Fragment(html.format(self=self))
         
         frag.add_css(self.resource_string("static/css/questions_bank.css"))
-        
         frag.add_javascript(self.resource_string("static/js/src/jquery-2.1.4.min.js"))
         frag.add_javascript(self.resource_string("static/js/src/jquery-ui.min.js"))
+   
         frag.add_javascript(self.resource_string("static/js/src/student_questions_bank.js"))
         
         frag.initialize_js('StudentQuestionsBankXBlock')
@@ -100,8 +100,14 @@ class QuestionsBankXBlock(XBlock):
         if(len(self.studentAnsweredQuestions)):
             html = self.resource_string("static/html/studio_analytics.html")
             frag = Fragment(html.format(self=self))
-            frag.initialize_js('StudioAnalytics')
+
+            frag.add_css(self.resource_string("static/css/questions_bank.css"))
+
+            frag.add_javascript(self.resource_string("static/js/src/jquery-2.1.4.min.js"))
+            frag.add_javascript(self.resource_string("static/js/src/jquery-ui.min.js"))
             frag.add_javascript(self.resource_string("static/js/src/studio_analytics.js"))
+
+            frag.initialize_js('StudioAnalytics')
 
         else:
             html = self.resource_string("static/html/studio_questions_bank.html")
@@ -117,6 +123,8 @@ class QuestionsBankXBlock(XBlock):
 
         return frag
     
+    author_view = studio_view
+
     @XBlock.json_handler
     def create_bank(self, data, suffix=''):
         """

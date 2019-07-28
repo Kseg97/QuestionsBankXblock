@@ -5,6 +5,19 @@
 
 function StudioAnalytics(runtime, element) {
 
+    // Immediately-invoked function expression
+    (function () {
+        // Load the script
+        var script = document.createElement("SCRIPT");
+        script.src = 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js';
+        script.type = 'text/javascript';
+        script.onload = function () {
+            var $ = window.jQuery;
+            // Use $ here...
+        };
+        document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+
     var handlerUrlLoadAnalytics = runtime.handlerUrl(element, 'load_analytics');
 
     //generates the form HTML
@@ -24,7 +37,7 @@ function StudioAnalytics(runtime, element) {
 
                 //Add the label
                 $currentField.find('label').text(questionary[i].label);
-                
+
                 //Any choices?
                 if (questionary[i].choices) {
                     var uniqueID = Math.floor(Math.random() * 999999) + 1;
@@ -35,11 +48,11 @@ function StudioAnalytics(runtime, element) {
 
                         if (fieldType == 'radio') {
                             var choiceHTML = checked == 1 ? '<label><input type="radio" name="radio-' + uniqueID + '" value="' + choice.label + '" checked>' + choice.label + '</label>' :
-                            '<label><input type="radio" name="radio-' + uniqueID + '" value="' + choice.label + '">' + choice.label + '</label>';
+                                '<label><input type="radio" name="radio-' + uniqueID + '" value="' + choice.label + '">' + choice.label + '</label>';
                             $currentField.find(".choices").append(choiceHTML);
                         } else if (fieldType == 'checkbox') {
-                            var choiceHTML = checked == 1 ? '<label><input type="checkbox" name="checkbox-' + uniqueID + '" value="' + choice.label + '">' + choice.label + '</label>':
-                            '<label><input type="checkbox" name="checkbox-' + uniqueID + '" value="' + choice.label + '">' + choice.label + '</label>';
+                            var choiceHTML = checked == 1 ? '<label><input type="checkbox" name="checkbox-' + uniqueID + '" value="' + choice.label + '">' + choice.label + '</label>' :
+                                '<label><input type="checkbox" name="checkbox-' + uniqueID + '" value="' + choice.label + '">' + choice.label + '</label>';
                             $currentField.find(".choices").append(choiceHTML);
                         }
                     }
@@ -52,7 +65,7 @@ function StudioAnalytics(runtime, element) {
                 }
             }
         }
-        $(':radio,:checkbox').click(function(){
+        $(':radio,:checkbox').click(function () {
             return false;
         });
     }
